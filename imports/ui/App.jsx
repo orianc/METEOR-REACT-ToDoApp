@@ -8,29 +8,41 @@ import { TasksCollection } from '../api/collection/TasksCollection';
 import Task from './components/Task/Task.js';
 import TaskForm from './components/TaskForm/TaskForm';
 import LoginForm from './components/LoginForm/LoginForm';
+import SignUpForm from './components/SignUpForm/SignUpForm';
 
 export const App = () => {
 	// note : useTracker bug quand on le déclare au dessus des hooks React...?
 	const [hideCompleted, setHideCompleted] = useState(false);
 
-	// user Tracker
-	const user = useTracker(() => Meteor.user());
+	const USER = useTracker(() => Meteor.user());
 
 	// request filter
 	const hideCompletedFilter = { isChecked: { $ne: true } };
-	const userFilter = user ? { userId: user._id } : {};
+	const userFilter = USER ? { userId: USER._id } : {};
 	const pendingOnlyFilter = { ...hideCompletedFilter, ...userFilter };
 
-	/**
-	 * fetch tasks data
-	 */
-	const tasks = useTracker(() => {
-		if (!user) {
-			return [];
+	const { tasks, pendingTasksCount, isLoading } = useTracker(() => {
+		const noDataAvailable = { tasks: [], pendingTasksCount: 0 };
+		if (!USER) {
+			console.log('nodata');
+			return noDataAvailable;
 		}
-		return TasksCollection.find(hideCompleted ? pendingOnlyFilter : userFilter, {
-			sort: { createdAt: -1 },
-		}).fetch();
+
+		const handler = Meteor.subscribe('tasks');
+		if (!handler.ready) {
+			console.log('loading');
+			return { ...noDataAvailable, isLoading: true };
+		}
+
+		const tasks = TasksCollection.find(
+			hideCompleted ? pendingOnlyFilter : userFilter,
+			{
+				sort: { createdAt: -1 },
+			},
+		).fetch();
+		const pendingTasksCount = TasksCollection.find(pendingOnlyFilter).count();
+		console.log('tasks fetch');
+		return { tasks, pendingTasksCount };
 	});
 
 	const toggleChecked = ({ _id, isChecked }) => {
@@ -51,37 +63,55 @@ export const App = () => {
 
 	return (
 		<div>
-			{user ? (
+			{USER ? (
 				<Fragment>
-					<div>
-						Connect as {user.username}
-						<button onClick={() => Meteor.logout()}>LogOut</button>
-					</div>
-
-					<TaskForm />
-					<h1>Task</h1>
-
-					<div>
-						<button className="button-filter" onClick={() => setHideCompleted(!hideCompleted)}>
-							{hideCompleted ? 'Show All' : 'Only Not Completed'}
+					<div className="top-bar">
+						<p>
+							Connect as <span className="userName">{USER.username}</span>
+						</p>
+						<div>
+							Pending tasks
+							<span className="tasksCount">{pendingTasksCount}</span>
+						</div>
+						<button className="logout" onClick={() => Meteor.logout()}>
+							Logout
 						</button>
 					</div>
-					{!tasks && <p>chargement...</p>}
-					{tasks && (
-						<ul>
-							{tasks.map((task) => (
-								<Task
-									key={task._id}
-									task={task}
-									onCheckBoxClick={toggleChecked}
-									onDeleteClick={deleteTask}
-								/>
-							))}
-						</ul>
-					)}
+
+					<div className="wrapper">
+						<TaskForm />
+						<div className="wrapper-task">
+							<h2>Tasks</h2>
+
+							<div>
+								<button
+									className="button-filter"
+									onClick={() => setHideCompleted(!hideCompleted)}
+								>
+									{hideCompleted ? 'Show All' : 'Only pending tasks'}
+								</button>
+							</div>
+							{isLoading && pendingTasksCount < 0 && <p>chargement...</p>}
+							{tasks && (
+								<ul>
+									{tasks.map((task) => (
+										<Task
+											key={task._id}
+											task={task}
+											onCheckBoxClick={toggleChecked}
+											onDeleteClick={deleteTask}
+										/>
+									))}
+								</ul>
+							)}
+						</div>
+					</div>
 				</Fragment>
 			) : (
-				<LoginForm />
+				<Fragment>
+					<LoginForm />
+					<SignUpForm />
+				</Fragment>
 			)}
 		</div>
 	);

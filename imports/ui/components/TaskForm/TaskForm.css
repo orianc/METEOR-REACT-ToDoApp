@@ -1,0 +1,44 @@
+.task-form {
+	width: 70%;
+	height: 100%;
+	position: absolute;
+	align-items: center;
+	top: 35px;
+	left: 0;
+	display: flex;
+	padding: 0 1rem;
+	flex-direction: column;
+	font-size: 1rem;
+	background-color: rgb(248, 248, 248);
+}
+h3 {
+	text-transform: uppercase;
+}
+.add-task-toggler > p {
+	font-size: 12px;
+	margin: 0 0.5rem 0 0;
+	display: inline;
+}
+.add-task-toggler {
+	cursor: pointer;
+	color: crimson;
+	top: 3rem;
+	left: 1rem;
+	padding: 6px 7px;
+	position: absolute;
+
+	border-radius: 50%;
+}
+.add-task-toggler-close {
+	background-color: crimson;
+	width: 20px;
+	margin: 0 10px 0 0;
+	display: inline-block;
+	color: white;
+	padding: 5px 5px;
+	border-radius: 5px;
+	cursor: pointer;
+}
+.task-form > button {
+	width: 20%;
+}

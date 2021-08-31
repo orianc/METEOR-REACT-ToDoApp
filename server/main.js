@@ -1,7 +1,9 @@
 import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
 import { TasksCollection } from '../imports/api/collection/TasksCollection';
+import '../imports/api/methods/tasksPublications';
 import '../imports/api/methods/tasksMethods';
+import '../imports/api/methods/signUpMethods';
 
 const DEFAULT_USERNAME = 'meteorite';
 const DEFAULT_PASSWORD = 'password';
