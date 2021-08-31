@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
 import { TasksCollection } from '../imports/api/collection/TasksCollection';
+import '../imports/api/methods/tasksMethods';
 
 const DEFAULT_USERNAME = 'meteorite';
 const DEFAULT_PASSWORD = 'password';
@@ -10,7 +11,12 @@ const DEFAULT_PASSWORD = 'password';
  * @param {*} taskText
  */
 const insertTask = (taskText, user) => {
-	TasksCollection.insert({ text: taskText, createdAt: new Date(), userId: user._id, createdBy: user.username });
+	TasksCollection.insert({
+		text: taskText,
+		createdAt: new Date(),
+		userId: user._id,
+		createdBy: user.username,
+	});
 };
 
 Meteor.startup(() => {
@@ -25,8 +31,15 @@ Meteor.startup(() => {
 	const user = Accounts.findUserByUsername(DEFAULT_USERNAME);
 
 	if (TasksCollection.find().count() === 0) {
-		['One Task', 'One Task', 'One Task', 'One Task', 'One Task', 'One Task', 'One Task', 'One Task'].forEach((taskText) =>
-			insertTask(taskText, user),
-		);
+		[
+			'One Task',
+			'One Task',
+			'One Task',
+			'One Task',
+			'One Task',
+			'One Task',
+			'One Task',
+			'One Task',
+		].forEach((taskText) => insertTask(taskText, user));
 	}
 });
