@@ -3,21 +3,21 @@ import { check } from 'meteor/check';
 import { TasksCollection } from '../collection/TasksCollection';
 
 Meteor.methods({
-	'tasks.insert'(text) {
-		check(text, String);
+	// 'tasks.insert'(text) {
+	// 	check(text, String);
 
-		if (!this.userId) {
-			throw new Meteor.Error('Not authorized');
-		}
+	// 	if (!this.userId) {
+	// 		throw new Meteor.Error('Not authorized');
+	// 	}
 
-		TasksCollection.insert({
-			text,
-			isChecked: false,
-			createdAt: new Date(),
-			userId: this.userId,
-		});
-	},
-
+	// 	TasksCollection.insert({
+	// 		text,
+	// 		isChecked: false,
+	// 		createdAt: new Date(),
+	// 		userId: this.userId,
+	// 	});
+	// },
+	//
 	'tasks.remove'(taskId) {
 		check(taskId, String);
 

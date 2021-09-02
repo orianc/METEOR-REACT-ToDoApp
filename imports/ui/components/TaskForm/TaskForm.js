@@ -1,9 +1,24 @@
 import React, { useState } from 'react';
 import { Meteor } from 'meteor/meteor';
+// gql
+import gql from 'graphql-tag';
+import { useMutation } from '@apollo/react-hooks';
+
 import './TaskForm.css';
+
+const taskMutation = gql`
+	mutation AddTask($newTask: String!) {
+		addTask(text: $newTask) {
+			_id
+		}
+	}
+`;
+
 const TaskForm = () => {
+	const [addTaskMutation] = useMutation(taskMutation);
 	const [toggle, setToggle] = useState(false);
 	const [newTask, setNewTask] = useState('');
+
 	const handleChange = (e) => {
 		e.preventDefault();
 		setNewTask(e.target.value);
@@ -13,9 +28,17 @@ const TaskForm = () => {
 		e.preventDefault();
 		if (!newTask) return console.log('nothing to submit');
 		try {
-			Meteor.call('tasks.insert', newTask);
-			console.log(`task added : ${newTask}`);
-			setNewTask('');
+			addTaskMutation({
+				variables: {
+					newTask,
+				},
+				refetchQueries: () => ['Tasks'],
+			})
+				.then(() => console.log('Tasks added with gql'))
+				.catch((e) => console.error('error on add task with gql', e)),
+				// 	Meteor.call('tasks.insert', newTask);
+				// console.log(`task added : ${newTask}`);
+				setNewTask('');
 			setToggle(false);
 		} catch (error) {
 			console.error(error);
